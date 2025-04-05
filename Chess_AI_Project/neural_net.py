@@ -1,4 +1,5 @@
-import numpy
+import copy
+
 import numpy as np
 
 
@@ -37,9 +38,35 @@ class chess_ai():
         return np.maximum(0,x)
 
     def neural_net(self):
+
+        hidden1_input = np.matmul(self.input_neuron, self.input_hidden1) + self.bias_hidden1
+        hidden1_output = chess_ai.relu(hidden1_input)
+
+        hidden2_input = np.matmul(self.hidden1_hidden2, hidden1_output) + self.hidden1_hidden2_bias
+        hidden2_output = chess_ai.relu(hidden2_input)
+
+        move_input = np.matmul(self.hidden2_output_move, hidden2_output) + self.hidden2_output_move_bias
+        move_output = chess_ai.relu(move_input)
+
+        piece_input = np.matmul(self.hidden2_output_piece, hidden2_output) + self.hidden2_output_piece_bias
+        piece_output = chess_ai.relu(piece_input)
+
+        return [piece_output, move_output]
+
+
+    def backprob_neural_net(self):
         pass
 
         
+    def loss(self, board, piece, move_row, move_col):
+        board_copy = copy.deepcopy(board)
+        
+
+
+
+
+
+
 
 
 

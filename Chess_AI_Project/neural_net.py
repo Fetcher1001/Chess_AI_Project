@@ -1,14 +1,16 @@
 import copy
-
+from Input_output_AI import *
 import numpy as np
-
+from Board import *
 
 class chess_ai():
 
-    def __init__(self,board):
-        self.input = np.array(board)
+    def __init__(self,board, board_input, color):
+        self.input = np.array(board_input)
         self.input_neuron = np.flatten(self.input)
 
+        self.board = board                                                      
+        self.color = color
         # weights and bias init ________________________________________________________________________________
         self.num_hidden1 = 128
         self.num_hidden2 = 64
@@ -27,6 +29,7 @@ class chess_ai():
         self.hidden2_output_piece_bias = np.random.rand(6)
 
          #_____________________________________________________________________________________________________
+
 
         self.output = []
         self.depth = 3
@@ -58,9 +61,49 @@ class chess_ai():
         pass
 
         
-    def loss(self, board, piece, move_row, move_col):
+    def loss(self, board, piece_type, move_row, move_col, player_color):
         board_copy = copy.deepcopy(board)
-        
+        io = InputOutput()
+
+
+        possible_moves = io.find_piece_position(board, piece_type, (move_row, move_col), player_color)
+        if not possible_moves:
+            return 1000
+
+        initial_row, initial_col = possible_moves[0]
+
+        move = Move(Square(initial_row, initial_col), Square(move_row, move_col))
+
+        piece = board.squares[initial_row][initial_col].piece
+
+        if board.valid_move(piece, move):
+            board_copy.move(piece, move)
+
+            io.read_input(board_copy)
+            update_input = io.board_input
+
+            score = sum([val for row in update_input for val in row if val >0])
+
+            if player_color == "white":
+                loss = -score
+            else:
+                loss = score
+        else:
+            loss = 1000
+
+        return loss
+
+      def train_step(self):
+          piece, moe_row, move_col = self.neural_net()
+          loss_value = self.loss(self.board)
+
+
+
+
+
+
+
+
 
 
 

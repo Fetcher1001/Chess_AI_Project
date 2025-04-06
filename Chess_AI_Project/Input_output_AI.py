@@ -29,8 +29,8 @@ class InputOutput():
         pass
 
 
-    def ai_input_output(self, board):
-        ai = chess_ai(board)
+    def ai_input_output(self):
+        ai = chess_ai(self.board_input)
         piece_move = ai.neural_net()
         p = piece_move[0]
         m = piece_move[1]
@@ -46,13 +46,23 @@ class InputOutput():
         return [piece, move_row, move_col]
 
 
-    def find_piece_position(self, piece_type, target_field, player_color):
+    def find_piece_position(self, board, piece_type, target_field, player_color):
         possible_positions = []
+        target_row, target_col = target_field
+
         for row in range(8):
             for col in range(8):
-                if self.board[row][col] == piece_type and self.color[row][col] == player_color:
-                    legal_moves = self.board.calc_moves(row, col)
-                    if target_field in legal_moves:
-                        possible_positions.append((row, col))
+                square = board.squares[row][col]
+                if square.has_piece():
+                    piece = square.piece
+                    if (piece.name == piece_type and
+                            piece.color == player_color):
+                        # Berechne legale Züge für diese Figur
+                        legal_moves = board.calc_moves(row, col)
+                        # Prüfe, ob das Zielfeld in den legalen Zügen ist
+                        if any(m.end.row == target_row and m.end.col == target_col
+                               for m in legal_moves):
+                            possible_positions.append((row, col))
+
         return possible_positions
 
